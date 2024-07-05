@@ -64,7 +64,7 @@ def main():
         message = cdata['message']
         url = f"https://github.com/{args.org}/{args.repo}/actions/runs/{args.action_run}/job/{ele_node['id']}/#step:{step_num}:{start_line}"
         if step_num == -1:
-            url = "URL INVALID"
+            url = "-"
 
         return {'url': url, 'message': message, 'conclusion': annotation_level}
     def sort_by_py_version(data):

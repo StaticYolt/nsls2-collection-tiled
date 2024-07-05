@@ -56,15 +56,6 @@ jobs:
           env | sort -u
           echo "$GITHUB_ENV"
 
-      # - uses: conda-incubator/setup-miniconda@v3
-      #   with:
-      #     python-version: ${{ matrix.python-version }}
-      #     # mamba-version: "*"
-      #     channels: conda-forge
-      #     channel-priority: strict
-      #     activate-environment: packaging
-      #     environment-file: envs/env-py${{ env.PYTHONVER }}.yml
-
       - name: Setup umamba
         uses: mamba-org/setup-micromamba@v1
         with:
@@ -138,6 +129,16 @@ jobs:
 #          name: ${{ env.CONDA_PACK_ENV_NAME }}
 #          path: ${{ env.ARTIFACTS_DIR }}
 #          retention-days: 60
+
+# - uses: conda-incubator/setup-miniconda@v3
+#   with:
+#     python-version: ${{ matrix.python-version }}
+#     # mamba-version: "*"
+#     channels: conda-forge
+#     channel-priority: strict
+#     activate-environment: packaging
+#     environment-file: envs/env-py${{ env.PYTHONVER }}.yml
+
   testing_conda_artifact:
     name: ${{ matrix.repos.beamline_acronym }}-${{ inputs.version }}
     needs: generate_conda_packd_envs
@@ -189,80 +190,80 @@ jobs:
             profile_branch: "master"
             beamline_acronym: "qas"
           - org: "NSLS-II-SST"
-#            repo: "profile_collection"
-#            branch: "master"
-#            profile_branch: "master"
-#            beamline_acronym: "sst"
-##          - org: "NSLS-II-TES"
-#            repo: "profile_collection"
-#            branch: "master"
-#            profile_branch: "master"
-#            beamline_acronym: "tes"
-#          - org: "NSLS-II-ISS"
-#            repo: "profile_collection"
-#            branch: "master"
-#            profile_branch: "master"
-#            beamline_acronym: "iss"
-#          - org: "NSLS-II-IXS"
-#            repo: "profile_collection"
-#            branch: "master"
-#            profile_branch: "master"
-#            beamline_acronym: "ixs"
-#          - org: "NSLS-II-CMS"
-#            repo: "profile_collection"
-#            branch: "master"
-#            profile_branch: "master"
-#            beamline_acronym: "cms"
-#          - org: "NSLS-II-CHX"
-#            repo: "profile_collection"
-#            branch: "master"
-#            profile_branch: "master"
-#            beamline_acronym: "chx"
-#          - org: "NSLS-II-SMI"
-#            repo: "profile_collection"
-#            branch: "master"
-#            profile_branch: "master"
-#            beamline_acronym: "smi"
-#          - org: "NSLS-II-LIX"
-#            repo: "profile_collection"
-#            branch: "master"
-#            profile_branch: "master"
-#            beamline_acronym: "lix"
-#          - org: "NSLS-II-XFP"
-#            repo: "profile_collection"
-#            branch: "master"
-#            profile_branch: "master"
-#            beamline_acronym: "xfp"
-#          - org: "NSLS-II-AMX"
-#            repo: "profile_collection"
-#            branch: "master"
-#            profile_branch: "master"
-#            beamline_acronym: "amx"
-#          - org: "NSLS-II-FMX"
-#            repo: "profile_collection"
-#            branch: "master"
-#            profile_branch: "master"
-#            beamline_acronym: "fmx"
-#          - org: "NSLS-II-FXI"
-#            repo: "profile_collection"
-#            branch: "master"
-#            profile_branch: "master"
-#            beamline_acronym: "fxi"
-#          - org: "NSLS-II-NYX"
-#            repo: "profile_collection"
-#            branch: "master"
-#            profile_branch: "master"
-#            beamline_acronym: "nyx"
-#          - org: "NSLS-II-ESM-1"
-#            repo: "profile_collection"
-#            branch: "master"
-#            profile_branch: "master"
-#            beamline_acronym: "esm1"
-#          - org: "NSLS-II-HEX"
-#            repo: "profile_collection"
-#            branch: "master"
-#            profile_branch: "master"
-#            beamline_acronym: "hex"
+            repo: "profile_collection"
+            branch: "master"
+            profile_branch: "master"
+            beamline_acronym: "sst"
+          - org: "NSLS-II-TES"
+            repo: "profile_collection"
+            branch: "master"
+            profile_branch: "master"
+            beamline_acronym: "tes"
+          - org: "NSLS-II-ISS"
+            repo: "profile_collection"
+            branch: "master"
+            profile_branch: "master"
+            beamline_acronym: "iss"
+          - org: "NSLS-II-IXS"
+            repo: "profile_collection"
+            branch: "master"
+            profile_branch: "master"
+            beamline_acronym: "ixs"
+          - org: "NSLS-II-CMS"
+            repo: "profile_collection"
+            branch: "master"
+            profile_branch: "master"
+            beamline_acronym: "cms"
+          - org: "NSLS-II-CHX"
+            repo: "profile_collection"
+            branch: "master"
+            profile_branch: "master"
+            beamline_acronym: "chx"
+          - org: "NSLS-II-SMI"
+            repo: "profile_collection"
+            branch: "master"
+            profile_branch: "master"
+            beamline_acronym: "smi"
+          - org: "NSLS-II-LIX"
+            repo: "profile_collection"
+            branch: "master"
+            profile_branch: "master"
+            beamline_acronym: "lix"
+          - org: "NSLS-II-XFP"
+            repo: "profile_collection"
+            branch: "master"
+            profile_branch: "master"
+            beamline_acronym: "xfp"
+          - org: "NSLS-II-AMX"
+            repo: "profile_collection"
+            branch: "master"
+            profile_branch: "master"
+            beamline_acronym: "amx"
+          - org: "NSLS-II-FMX"
+            repo: "profile_collection"
+            branch: "master"
+            profile_branch: "master"
+            beamline_acronym: "fmx"
+          - org: "NSLS-II-FXI"
+            repo: "profile_collection"
+            branch: "master"
+            profile_branch: "master"
+            beamline_acronym: "fxi"
+          - org: "NSLS-II-NYX"
+            repo: "profile_collection"
+            branch: "master"
+            profile_branch: "master"
+            beamline_acronym: "nyx"
+          - org: "NSLS-II-ESM-1"
+            repo: "profile_collection"
+            branch: "master"
+            profile_branch: "master"
+            beamline_acronym: "esm1"
+          - org: "NSLS-II-HEX"
+            repo: "profile_collection"
+            branch: "master"
+            profile_branch: "master"
+            beamline_acronym: "hex"
 
     runs-on: ubuntu-latest
     steps:
@@ -363,7 +364,7 @@ jobs:
         with:
           mongodb-version: '4.4'
       - name: Set Up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: 3.11
       - name: Performing Beamline Actions
@@ -400,7 +401,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
       - name: Set Up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: 3.11
       - name: Running Script To Get Job Info To md File
