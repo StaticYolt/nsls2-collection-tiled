@@ -49,12 +49,12 @@ def main():
         conceptrecid = "12688274" # never changes, it's for the initial version.
         version = "2024-2.2"
         token = os.environ["ZENODO_TOKEN"]
-
+        print(token)
         resp = upload_artifacts.create_new_version(
             conceptrecid=conceptrecid,
             # version=f"{version}-tiled",
             version=f"{version}",
-            token=token,
+            token=f"{token}",
             # extra_files={"README.md": "r", "LICENSE": "r"}  # used for testing purposes
             extra_files={
                 # # Python 3.8 (non-tiled)
