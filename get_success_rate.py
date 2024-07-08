@@ -2,7 +2,7 @@ import argparse
 import os
 import json
 import subprocess
-
+import upload_artifacts
 
 def main():
     parser = argparse.ArgumentParser(description='Generate a report of status of each beamline for a python version')
@@ -46,9 +46,87 @@ def main():
     num_success_jobs = len(success_jobs)
     success_percentage = int(float(num_success_jobs / num_total_tests) * 100)
     if success_percentage > 80:
-        with open('upload_artifacts.py') as file:
-            exec(file.read())
-        print("RUNNING UPLOAD ARTIFACTS")
+        conceptrecid = "12688273" # never changes, it's for the initial version.
+        version = "2024-2.2"
+        token = os.environ["ZENODO_TOKEN"]
+
+        resp = upload_artifacts.create_new_version(
+            conceptrecid=conceptrecid,
+            # version=f"{version}-tiled",
+            version=f"{version}",
+            token=token,
+            # extra_files={"README.md": "r", "LICENSE": "r"}  # used for testing purposes
+            extra_files={
+                # # Python 3.8 (non-tiled)
+                # f"{version}-py38-md5sum.txt": "r",
+                # f"{version}-py38-sha256sum.txt": "r",
+                # f"{version}-py38.yml": "r",
+                # f"Dockerfile-{version}-py38": "r",
+                # f"runner-{version}-py38.sh": "r",
+                # f"{version}-py38.tar.gz": "rb",
+
+                # # Python 3.9 (non-tiled)
+                # f"{version}-py39-md5sum.txt": "r",
+                # f"{version}-py39-sha256sum.txt": "r",
+                # f"{version}-py39.yml": "r",
+                # f"Dockerfile-{version}-py39": "r",
+                # f"runner-{version}-py39.sh": "r",
+                # f"{version}-py39.tar.gz": "rb",
+
+                # # Python 3.10 (non-tiled)
+                # f"{version}-py310-md5sum.txt": "r",
+                # f"{version}-py310-sha256sum.txt": "r",
+                # f"{version}-py310.yml": "r",
+                # f"Dockerfile-{version}-py310": "r",
+                # f"runner-{version}-py310.sh": "r",
+                # f"{version}-py310.tar.gz": "rb",
+
+                # # Python 3.11 (non-tiled)
+                # f"{version}-py311-md5sum.txt": "r",
+                # f"{version}-py311-sha256sum.txt": "r",
+                # f"{version}-py311.yml": "r",
+                # f"Dockerfile-{version}-py311": "r",
+                # f"runner-{version}-py311.sh": "r",
+                # f"{version}-py311.tar.gz": "rb",
+
+                # # Python 3.8 (tiled)
+                # f"{version}-py38-tiled-md5sum.txt": "r",
+                # f"{version}-py38-tiled-sha256sum.txt": "r",
+                # f"{version}-py38-tiled.yml": "r",
+                # f"Dockerfile-{version}-py38-tiled": "r",
+                # f"runner-{version}-py38-tiled.sh": "r",
+                # f"{version}-py38-tiled.tar.gz": "rb",
+
+                # # Python 3.9 (tiled)
+                # f"{version}-py39-tiled-md5sum.txt": "r",
+                # f"{version}-py39-tiled-sha256sum.txt": "r",
+                # f"{version}-py39-tiled.yml": "r",
+                # f"Dockerfile-{version}-py39-tiled": "r",
+                # f"runner-{version}-py39-tiled.sh": "r",
+                # f"{version}-py39-tiled.tar.gz": "rb",
+
+                # Python 3.10 (tiled)
+                f"{version}-py310-tiled-md5sum.txt": "r",
+                f"{version}-py310-tiled-sha256sum.txt": "r",
+                f"{version}-py310-tiled.yml.txt": "r",
+                f"{version}-py310-tiled.tar.gz": "rb",
+
+                # Python 3.11 (tiled)
+                f"{version}-py311-tiled-md5sum.txt": "r",
+                f"{version}-py311-tiled-sha256sum.txt": "r",
+                f"{version}-py311-tiled.yml.txt": "r",
+                f"{version}-py311-tiled.tar.gz": "rb",
+
+                # Python 3.12 (tiled)
+                f"{version}-py312-tiled-md5sum.txt": "r",
+                f"{version}-py312-tiled-sha256sum.txt": "r",
+                f"{version}-py312-tiled.yml.txt": "r",
+                f"{version}-py312-tiled.tar.gz": "rb",
+            },
+        )
+        # with open('upload_artifacts.py') as file:
+        #     exec(file.read())
+        # print("RUNNING UPLOAD ARTIFACTS")
 
 if __name__ == "__main__":
     main()
