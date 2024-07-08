@@ -38,11 +38,11 @@ def main():
         with open(f'{args.check_run_json}.json') as file:
             check_data = json.load(file)
 
-            step_num = -1
+            step_num = -1 # Sentinel value
             start_line = -1
             annotation_level = ""
             message = ""
-            # if conc == "failure":
+
             steps = ele_node['steps']
             for step in steps:
                 if step['conclusion'] == 'failure':
@@ -51,6 +51,8 @@ def main():
                 elif step['conclusion'] == 'warning':
                     step_num = step['number']
                     break
+
+            # ele_node['id'] represents the check run ID of the job
             os.system(f'''gh api \
                     -H "Accept: application/vnd.github+json" \
                     -H "X-GitHub-Api-Version: 2022-11-28" \
@@ -71,6 +73,7 @@ def main():
                 return {'url': url, 'message': message, 'conclusion': annotation_level}
     def sort_by_py_version(data):
         for element in data['jobs']:
+            # element name would look like "version ... srx-3.xx"
             if element['name'][-4:] == chosen_python_version:
                 print(element)
                 relevant_jobs.append(element)
@@ -88,7 +91,7 @@ def main():
                 case "cancelled":
                     cancelled_jobs.append(element)
                 case _:
-                    # This should never happen
+                    # This should never happen because element['conclusion'] can only be success/failure/cancelled
                     print("ERROR")
         f.close()
     num_total_tests = len(relevant_jobs)
@@ -103,9 +106,9 @@ def main():
         # looping like this to give more control over sorting
         for element in relevant_jobs:
             if element:
+                # gets "csx" from "version-matrix (3.10) / csx-3.10"
                 element_name = element['name'].split(" ")[3].split("-")[0]
                 results = get_check_run_url(element)
-                # print(results)
                 match element['conclusion']:
                     case "failure":
                         failure_msg = "failure"
@@ -123,8 +126,6 @@ def main():
                         md.write(f"|{element_name}|{success_msg}|{message}|{results['url']}|\n")
                         print("cancelled")
         md.close()
-
-
 
 if __name__ == "__main__":
     main()
