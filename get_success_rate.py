@@ -30,23 +30,24 @@ def main():
                 print(element)
                 relevant_jobs.append(element)
 
-    f = open(f'{args.json_name}.json')
-    data = json.load(f)
-    sort_by_py_version(data)
-    for element in relevant_jobs:
-        conclusion = element['conclusion']
-        match conclusion:
-            case "success":
-                success_jobs.append(element)
-            case _:
-                # This should never happen
-                print("ERROR")
+    with open(f'{args.json_name}.json') as f:
+        data = json.load(f)
+        sort_by_py_version(data)
+        for element in relevant_jobs:
+            conclusion = element['conclusion']
+            match conclusion:
+                case "success":
+                    success_jobs.append(element)
+                case _:
+                    # This should never happen
+                    print("ERROR")
 
     num_total_tests = len(relevant_jobs)
     num_success_jobs = len(success_jobs)
     success_percentage = int(float(num_success_jobs / num_total_tests) * 100)
     if success_percentage > 80:
-        subprocess.run(['python', 'upload_artifacts.py'])
+        with open('upload_artifacts.py') as file:
+            exec(file.read())
         print("RUNNING UPLOAD ARTIFACTS")
 
 if __name__ == "__main__":
