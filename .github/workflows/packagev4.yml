@@ -314,6 +314,9 @@ jobs:
           
           export GHA_TOKEN=${{github.token}}
           echo "GHA_TOKEN=${GHA_TOKEN}" >> $GITHUB_ENV
+          
+          export GH_TOKEN=${{github.token}}
+          echo "GH_TOKEN=${GH_TOKEN}" >> $GITHUB_ENV
       - name: Putting Output Of Previous Job as Env Var
         run: |
           echo ${{ needs.testing_conda_artifact.outputs.test_conda_packed_name }}
