@@ -6,6 +6,7 @@ import subprocess
 
 def main():
     parser = argparse.ArgumentParser(description='Generate a report of status of each beamline for a python version')
+    parser.add_argument("-p", "--python_version", default="3.10", help="The python ver for Conda")
     parser.add_argument("-a", "--action_run", default="9839701048", help="The ID(s) of current workflow")
     parser.add_argument("-j", "--json_name", default="workflow_info",
                         help="jsonfile containing info about previous job of current workflow")
@@ -19,12 +20,13 @@ def main():
         -H "X-GitHub-Api-Version: 2022-11-28" \
         /repos/{args.org}/{args.repo}/actions/runs/{args.action_run}/jobs > {args.json_name}.json''')
 
+    chosen_python_version = str(args.python_version)
     relevant_jobs = []
     success_jobs = []
     def sort_by_py_version(data):
         job_name = "3."
         for element in data['jobs']:
-            if element['name'][-4:-2] == job_name:
+            if element['name'][-4:] == chosen_python_version:
                 print(element)
                 relevant_jobs.append(element)
 
