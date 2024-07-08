@@ -73,7 +73,8 @@ def create_new_version(
         params={"access_token": token},
     )
     print_now(ret_newver.url, ret_newver.status_code, ret_newver.json())
-
+    print(ret_newver.json())
+    print(ret_newver.json()["links"])
     newver_draft = ret_newver.json()["links"]["self"]
 
     notes_urls = [
