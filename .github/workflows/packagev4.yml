@@ -335,6 +335,7 @@ jobs:
       - name: Upload artifacts to Zenodo
         env:
           WORKFLOW_IDS: "${{ github.run_id }}"
+          ZENODO_TOKEN: "${{ env.ZENODO_TOKEN }}"
         run: |
           python3 -m pip install requests
           python3 get_success_rate.py -a "$WORKFLOW_IDS" -p "${{ inputs.version }}"
