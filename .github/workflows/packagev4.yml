@@ -299,6 +299,10 @@ jobs:
           python3 beamline_status_to_md.py -p "${{ inputs.version }}" -a "${{ github.run_id }}" -m "$MD_FILE_NAME"
           cat "$MD_FILE_NAME.md"
           cp "$MD_FILE_NAME.md" $GITHUB_STEP_SUMMARY
+      - name: Getting Success Rate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh run view --log | grep GITHUB_STEP_SUMMARY
   deposition:
     needs: [testing_conda_artifact, report_generation]
     runs-on: ubuntu-latest
