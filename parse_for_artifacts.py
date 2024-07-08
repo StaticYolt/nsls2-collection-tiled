@@ -19,17 +19,17 @@ def main():
             /repos/{args.organization}/{args.repository}/actions/artifacts >> {args.file_name}.json
     '''
     os.system(artifact_command)
-    f = open(f"{args.file_name}.json")
-    data = json.load(f)
-    for element in data['artifacts']:
-        if element['workflow_run'].get('id') == int(args.action_run) and os.path.splitext(element['name'])[1] != '.yml':
-            os.system(f"echo \"link: {str(element['url'])}\"")
+    with open(f"{args.file_name}.json") as f:
+        data = json.load(f)
+        for element in data['artifacts']:
+            if element['workflow_run'].get('id') == int(args.action_run) and os.path.splitext(element['name'])[1] != '.yml':
+                os.system(f"echo \"link: {str(element['url'])}\"")
 
-            os.system(f"GHA_TOKEN={os.environ['GHA_TOKEN']} bash download-artifacts.sh "
-                      f"{args.repository}"
-                      f"{args.organization}"
-                      f"{str(element['id'])}"
-                      f"{str(element['name'])}")
+                os.system(f"GHA_TOKEN={os.environ['GHA_TOKEN']} bash download-artifacts.sh "
+                          f"{args.repository}"
+                          f"{args.organization}"
+                          f"{str(element['id'])}"
+                          f"{str(element['name'])}")
             # print("url: " + str(element['url']))
             # print("artifact_id: " + str(element['id']))
             # print("repo_name: " + str(str(element['url']).split('/')[5]))
