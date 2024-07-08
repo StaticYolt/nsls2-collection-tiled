@@ -3,7 +3,7 @@ import os
 import json
 import subprocess
 import upload_artifacts
-
+import requests
 def main():
     parser = argparse.ArgumentParser(description='Generate a report of status of each beamline for a python version')
     parser.add_argument("-p", "--python_version", default="3.10", help="The python ver for Conda")
