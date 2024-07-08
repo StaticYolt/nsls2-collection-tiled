@@ -332,7 +332,7 @@ jobs:
           python3 parse_for_artifacts.py -a "$WORKFLOW_IDS"
       - name: Upload artifacts to Zenodo
         run: |
-          python3 upload-artifacts.py
+          python3 upload_artifacts.py
 
 #      - name: Upload artifacts for release
 #        uses: actions/upload-artifact@v4
