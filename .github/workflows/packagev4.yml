@@ -109,11 +109,9 @@ jobs:
           retention-days: 60
 
       - name: Upload artifacts for branch
-        if: |
-          github.ref != 'refs/heads/main'
         uses: actions/upload-artifact@v4
         with:
-          name: test-${{ env.CONDA_PACK_ENV_NAME }}
+          name: ${{ env.CONDA_PACK_ENV_NAME }}
           path: ${{ env.ARTIFACTS_DIR }}
           retention-days: 14
 
@@ -145,13 +143,9 @@ jobs:
             branch: "master"
             profile_branch: "master"
             beamline_acronym: "srx"
-
-
     runs-on: ubuntu-latest
     steps:
-      - run: |
-          echo "${{ needs.generate_conda_packd_envs.outputs.test_conda_packed_name }}"
-          echo "TEST_CONDA_PACKED_NAME=${{ needs.generate_conda_packd_envs.outputs.test_conda_packed_name }}" >> $GITHUB_ENV
+      - run: echo "TEST_CONDA_PACKED_NAME=${{ needs.generate_conda_packd_envs.outputs.test_conda_packed_name }}" >> $GITHUB_ENV
       - name: Checkout Repository
         uses: actions/checkout@v4
       - name: Cloning Remote Repositories
@@ -222,7 +216,7 @@ jobs:
       - name: Downloading Conda Artifact
         uses: actions/download-artifact@v4
         with:
-          name: test-${{ env.TEST_CONDA_PACKED_NAME }}
+          name: ${{ env.TEST_CONDA_PACKED_NAME }}
       - name: Downloading Conda YML
         uses: actions/download-artifact@v4
         with:
@@ -302,6 +296,8 @@ jobs:
   deposition:
     needs: [testing_conda_artifact, report_generation]
     runs-on: ubuntu-latest
+    env:
+      WORKFLOW_ID: ${{ github.run_id }}
     steps:
       - name: Set env vars
         run: |
@@ -319,26 +315,18 @@ jobs:
           echo "TEST_CONDA_PACKED_NAME=${{ needs.generate_conda_packd_envs.outputs.test_conda_packed_name }}" >> $GITHUB_ENV
       - name: checkout the code
         uses: actions/checkout@v4
-#      - name: pip-install dependencies
-#        run: |
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
       - name: download artifacts v2
-        env:
-          WORKFLOW_IDS: "${{ github.run_id }}"
         run: |
           set -vxeuo pipefail
-          python3 parse_for_artifacts.py -a "$WORKFLOW_IDS"
+          python3 parse_for_artifacts.py -a "${{ env.WORKFLOW_ID }}"
       - name: Upload artifacts to Zenodo
-        env:
-          WORKFLOW_IDS: "${{ github.run_id }}"
-          ZENODO_TOKEN: "${{ env.ZENODO_TOKEN }}"
         run: |
           python3 -m pip install requests
-          python3 get_success_rate.py -a "$WORKFLOW_IDS" -p "${{ inputs.version }}"
+          python3 get_success_rate.py -a "${{ env.WORKFLOW_ID }}" -p "${{ inputs.version }}"
 
 #      - name: Upload artifacts for release
 #        uses: actions/upload-artifact@v4
