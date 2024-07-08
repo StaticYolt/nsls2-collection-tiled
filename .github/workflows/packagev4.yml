@@ -319,7 +319,9 @@ jobs:
           echo "TEST_CONDA_PACKED_NAME=${{ needs.generate_conda_packd_envs.outputs.test_conda_packed_name }}" >> $GITHUB_ENV
       - name: checkout the code
         uses: actions/checkout@v4
-
+      - name: pip-install dependencies
+        run: |
+          python3 -m pip install requests
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -331,8 +333,10 @@ jobs:
           set -vxeuo pipefail
           python3 parse_for_artifacts.py -a "$WORKFLOW_IDS"
       - name: Upload artifacts to Zenodo
+        env:
+          WORKFLOW_IDS: "${{ github.run_id }}"
         run: |
-          python3 upload_artifacts.py
+          python3 get_success_rate.py -a "$WORKFLOW_IDS"
 
 #      - name: Upload artifacts for release
 #        uses: actions/upload-artifact@v4
