@@ -285,8 +285,9 @@ jobs:
           export TILED_API_KEY=secret
           nohup tiled serve catalog --temp --api-key=$TILED_API_KEY &
           sleep 10
-
-          ipython --profile-dir "$HOME/${{ matrix.repos.repo }}"
+          
+          ls
+          ipython --profile-dir "${{ matrix.repos.repo }}"
   report_generation:
     needs: testing_conda_artifact
     if: |
