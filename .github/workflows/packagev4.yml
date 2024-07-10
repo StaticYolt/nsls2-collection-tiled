@@ -309,7 +309,7 @@ jobs:
           MD_FILE_NAME: markdown_file
           GH_TOKEN: ${{ github.token }}
         run: |
-          python3 beamline_status_to_md2.py -p "${{ inputs.version }}" -a "${{ github.run_id }}" -m "$MD_FILE_NAME"
+          python3 beamline_status_to_md.py -p "${{ inputs.version }}" -a "${{ github.run_id }}" -m "$MD_FILE_NAME"
           cat "$MD_FILE_NAME.md"
           cp "$MD_FILE_NAME.md" $GITHUB_STEP_SUMMARY
   
