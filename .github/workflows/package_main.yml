@@ -15,6 +15,7 @@ jobs:
   deposition:
     needs: version-matrix
     runs-on: ubuntu-latest
+    if: always()
     env:
       WORKFLOW_ID: ${{ github.run_id }}
     steps:
