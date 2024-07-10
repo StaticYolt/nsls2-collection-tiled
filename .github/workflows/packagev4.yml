@@ -143,6 +143,31 @@ jobs:
             branch: "master"
             profile_branch: "master"
             beamline_acronym: "srx"
+          - org: "NSLS-II-SIX"
+            repo: "profile_collection"
+            branch: "master"
+            profile_branch: "master"
+            beamline_acronym: "six"
+          - org: "NSLS-II-HXN"
+            repo: "profile_collection"
+            branch: "master"
+            profile_branch: "master"
+            beamline_acronym: "hxn"
+          - org: "NSLS-II-ISR"
+            repo: "profile_analysis"
+            branch: "master"
+            profile_branch: "master"
+            beamline_acronym: "isr"
+          - org: "NSLS-II-BMD"
+            repo: "profile_collection"
+            branch: "master"
+            profile_branch: "master"
+            beamline_acronym: "bmm"
+          - org: "NSLS-II-QAS"
+            repo: "profile_collection"
+            branch: "master"
+            profile_branch: "master"
+            beamline_acronym: "qas"
     runs-on: ubuntu-latest
     steps:
       - run: echo "TEST_CONDA_PACKED_NAME=${{ needs.generate_conda_packd_envs.outputs.test_conda_packed_name }}" >> $GITHUB_ENV
@@ -199,20 +224,6 @@ jobs:
             sudo mkdir -v -p /etc/bluesky/
             sudo mv -v kafka.yml /etc/bluesky/kafka.yml
             cat /etc/bluesky/kafka.yml
-#      - name: Setup Ipython Test Profile
-#        run: |
-#          pip install ipython
-#          ipython profile create ${{env.PROFILE_NAME}}
-#          echo "Preparing test profile"
-#          rm -rfv profile_collection
-#            git clone "${{ env.REPO_URL }}" profile_collection
-#            (
-#              cd profile_collection
-#              git checkout "${{matrix.repos.profile_branch}}"
-#              rm -rfv ~/.ipython/profile_${{env.PROFILE_NAME}}/
-#              mkdir -pv ~/.ipython/profile_${{env.PROFILE_NAME}}/
-#              cp -rv startup ~/.ipython/profile_${{env.PROFILE_NAME}}/
-#            )
       - name: Downloading Conda Artifact
         uses: actions/download-artifact@v4
         with:
@@ -267,12 +278,6 @@ jobs:
           sudo pip install supervisor
           chmod +x supervisor/start_supervisor.sh
           supervisor/start_supervisor.sh status
-#      - name: Activate IPython Profile
-#        run: |
-#          eval "$(conda shell.bash hook)"
-#          conda activate "${{ env.CONDA_PREFIX }}/envs/${{ env.TEST_CONDA_PACKED_NAME }}"
-#          ipython --profile-dir
-
       - name: Activate IPython Profile
         run: |
           set -eo pipefail
@@ -285,8 +290,6 @@ jobs:
           export TILED_API_KEY=secret
           nohup tiled serve catalog --temp --api-key=$TILED_API_KEY &
           sleep 10
-          
-          ls
           ipython --profile-dir "${{ matrix.repos.repo }}"
   report_generation:
     needs: testing_conda_artifact
