@@ -18,6 +18,7 @@ def main():
             -H \"X-GitHub-Api-Version: 2022-11-28\" \\
             /repos/{args.organization}/{args.repository}/actions/artifacts >> {args.file_name}.json
     '''
+
     os.system(artifact_command)
     with open(f"{args.file_name}.json") as f:
         data = json.load(f)
@@ -30,10 +31,6 @@ def main():
                           f"{args.organization}"
                           f"{str(element['id'])}"
                           f"{str(element['name'])}")
-            # print("url: " + str(element['url']))
-            # print("artifact_id: " + str(element['id']))
-            # print("repo_name: " + str(str(element['url']).split('/')[5]))
-            # print("env_name: " + str(element['name']))
 
 if __name__ == "__main__":
     main()

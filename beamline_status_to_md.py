@@ -6,7 +6,7 @@ import json
 def main():
     parser = argparse.ArgumentParser(description='Generate a report of status of each beamline for a python version')
     parser.add_argument("-p", "--python_version", default="3.10", help="The python ver for Conda")
-    parser.add_argument("-a", "--action_run", default="9839701048", help="The ID(s) of current workflow")
+    parser.add_argument("-a", "--action_run", default="9784144631", help="The ID(s) of current workflow")
     parser.add_argument("-j", "--json_name", default="workflow_info",
                         help="jsonfile containing info about previous job of current workflow")
     parser.add_argument("-m", "--markdown_name", default="job_info",
@@ -29,12 +29,21 @@ def main():
     failure_jobs = []
     cancelled_jobs = []
 
+    def get_check_run_info(org, repo, check_id, jfile):
+        os.system(f'''gh api \
+                        -H "Accept: application/vnd.github+json" \
+                        -H "X-GitHub-Api-Version: 2022-11-28" \
+                        /repos/{org}/{repo}/check-runs/{check_id} > {jfile}.json''')
+    def get_annotation_info(org, repo, check_id, jfile):
+        os.system(f'''gh api \
+                            -H "Accept: application/vnd.github+json" \
+                            -H "X-GitHub-Api-Version: 2022-11-28" \
+                            /repos/{org}/{repo}/check-runs/{check_id}/annotations > {jfile}.json''')
+
     def get_check_run_url(ele_node):
         url = ""
-        os.system(f'''gh api \
-                -H "Accept: application/vnd.github+json" \
-                -H "X-GitHub-Api-Version: 2022-11-28" \
-                /repos/{args.org}/{args.repo}/check-runs/{ele_node['id']} > {args.check_run_json}.json''')
+        get_check_run_info(args.org, args.repo, ele_node['id'], args.check_run_json)
+
         with open(f'{args.check_run_json}.json') as file:
             check_data = json.load(file)
 
@@ -50,13 +59,10 @@ def main():
                     break
                 elif step['conclusion'] == 'warning':
                     step_num = step['number']
-                    break
 
             # ele_node['id'] represents the check run ID of the job
-            os.system(f'''gh api \
-                    -H "Accept: application/vnd.github+json" \
-                    -H "X-GitHub-Api-Version: 2022-11-28" \
-                    /repos/{args.org}/{args.repo}/check-runs/{ele_node['id']}/annotations > {args.check_run_json}.json''')
+            get_annotation_info(args.org, args.repo, ele_node['id'], args.check_run_json)
+
             with open(f'{args.check_run_json}.json') as file_two:
                 check_data = json.load(file_two)
                 if check_data:
@@ -82,6 +88,7 @@ def main():
         data = json.load(f)
         sort_by_py_version(data)
         for element in relevant_jobs:
+            print(element)
             conclusion = element['conclusion']
             match conclusion:
                 case "success":
@@ -107,7 +114,7 @@ def main():
         for element in relevant_jobs:
             if element:
                 # gets "csx" from "version-matrix (3.10) / csx-3.10"
-                element_name = element['name'].split(" ")[3].split("-")[0]
+                element_name = element['name'].split(" ")[-1].split("-")[0]
                 results = get_check_run_url(element)
                 match element['conclusion']:
                     case "failure":
