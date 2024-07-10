@@ -20,13 +20,12 @@ def main():
         -H "X-GitHub-Api-Version: 2022-11-28" \
         /repos/{args.org}/{args.repo}/actions/runs/{args.action_run}/jobs > {args.json_name}.json''')
 
-    chosen_python_version = str(args.python_version)
     relevant_jobs = []
     success_jobs = []
     def sort_by_py_version(data):
         job_name = "3."
         for element in data['jobs']:
-            if element['name'][-4:] == chosen_python_version:
+            if element['name'][-4:-2] == job_name:
                 print(element)
                 relevant_jobs.append(element)
 
@@ -45,6 +44,7 @@ def main():
     num_total_tests = len(relevant_jobs)
     num_success_jobs = len(success_jobs)
     success_percentage = int(float(num_success_jobs / num_total_tests) * 100)
+
     if success_percentage > 80:
         conceptrecid = "12688274" # never changes, it's for the initial version.
         version = "2024-2.2"
