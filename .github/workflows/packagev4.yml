@@ -199,20 +199,20 @@ jobs:
             sudo mkdir -v -p /etc/bluesky/
             sudo mv -v kafka.yml /etc/bluesky/kafka.yml
             cat /etc/bluesky/kafka.yml
-      - name: Setup Ipython Test Profile
-        run: |
-          pip install ipython
-          echo "Preparing test profile"
-          rm -rfv profile_collection
-            git clone "${{ env.REPO_URL }}" profile_collection
-            (
-              cd profile_collection
-              git checkout "${{matrix.repos.profile_branch}}"
-              rm -rfv ~/.ipython/profile_${{env.PROFILE_NAME}}/
-              mkdir -pv ~/.ipython/profile_${{env.PROFILE_NAME}}/
-              cp -rv startup ~/.ipython/profile_${{env.PROFILE_NAME}}/
-            )
-          ipython profile create ${{env.PROFILE_NAME}}
+#      - name: Setup Ipython Test Profile
+#        run: |
+#          pip install ipython
+#          ipython profile create ${{env.PROFILE_NAME}}
+#          echo "Preparing test profile"
+#          rm -rfv profile_collection
+#            git clone "${{ env.REPO_URL }}" profile_collection
+#            (
+#              cd profile_collection
+#              git checkout "${{matrix.repos.profile_branch}}"
+#              rm -rfv ~/.ipython/profile_${{env.PROFILE_NAME}}/
+#              mkdir -pv ~/.ipython/profile_${{env.PROFILE_NAME}}/
+#              cp -rv startup ~/.ipython/profile_${{env.PROFILE_NAME}}/
+#            )
       - name: Downloading Conda Artifact
         uses: actions/download-artifact@v4
         with:
@@ -271,7 +271,22 @@ jobs:
 #        run: |
 #          eval "$(conda shell.bash hook)"
 #          conda activate "${{ env.CONDA_PREFIX }}/envs/${{ env.TEST_CONDA_PACKED_NAME }}"
-#          ipython --profile ${{env.PROFILE_NAME}}
+#          ipython --profile-dir
+
+      - name: Activate IPython Profile
+        run: |
+          set -eo pipefail
+          eval "$(conda shell.bash hook)"
+          conda activate "${{ env.CONDA_PREFIX }}/envs/${{ env.TEST_CONDA_PACKED_NAME }}"
+
+          for tiled_profile_name in nsls2 ${{matrix.repos.beamline_acronym}}; do
+            tiled profile create --name $tiled_profile_name http://127.0.0.1:8000
+          done
+          export TILED_API_KEY=secret
+          nohup tiled serve catalog --temp --api-key=$TILED_API_KEY &
+          sleep 10
+
+          ipython --profile-dir "$HOME/${{ matrix.repos.repo }}"
   report_generation:
     needs: testing_conda_artifact
     if: |
