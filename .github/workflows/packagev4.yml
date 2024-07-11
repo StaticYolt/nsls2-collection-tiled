@@ -182,7 +182,9 @@ jobs:
         with:
           python-version: 3.11
       - name: Beamline Specific Configurations
-        run: python3 special_config -b "${{ matrix.repo.beamline_acronym }}"
+        run: |
+          ls
+          python3 special_config.py -b "${{ matrix.repo.beamline_acronym }}"
       - name: Configuring defaults (pyOlog, databroker, and kafka)
         run: |
           echo "pyOlog config:"
