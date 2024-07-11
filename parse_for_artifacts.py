@@ -23,7 +23,8 @@ def main():
     with open(f"{args.file_name}.json") as f:
         data = json.load(f)
         for element in data['artifacts']:
-            if element['workflow_run'].get('id') == int(args.action_run) and os.path.splitext(element['name'])[1] != '.yml':
+            # and os.path.splitext(element['name'])[1] != '.yml'
+            if element['workflow_run'].get('id') == int(args.action_run):
                 os.system(f"echo \"link: {str(element['url'])}\"")
 
                 os.system(f"GHA_TOKEN={os.environ['GHA_TOKEN']} bash download-artifacts.sh "
