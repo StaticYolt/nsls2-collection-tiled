@@ -5,8 +5,9 @@ import json
 bdict = {"csx": {"info1": "value1", "info2": "value2"},
          "srx": {"info1": "value1", "info2": "value2"},
          }
-curr_bdict = {}
 def main():
+    curr_bdict = {}
+
     parser = argparse.ArgumentParser(description='Parses Json and passes arguments to download-artifacts-sh')
     parser.add_argument("-b", "--beamline_acronym", help="Example csx")
     args = parser.parse_args()
@@ -20,6 +21,7 @@ def main():
         case _:
             pass
 
-    print(curr_bdict)
+    if curr_bdict:
+        print(curr_bdict)
 if __name__ == "__main__":
     main()
