@@ -33,6 +33,7 @@ def upload_files(bucket_url, files, token):
         data=json.dumps([{"key": os.path.basename(file)} for file in files]),
     )
     print_now(ret_declare.status_code, ret_declare.text)
+    print(ret_declare.json())
 
     for file, mode in files.items():
         print_now(f"Uploading {file}...")
@@ -187,17 +188,16 @@ conda-unpack
         }
     }
 
-    resp_update = requests.get(
+    resp_update = requests.post(
         newver_draft,
         params={"access_token": token},
         headers={"Content-Type": "application/json"},
         data=json.dumps(data),
     )
-    print(resp_update.json())
-    print(newver_draft)
+
     print_now(newver_draft, resp_update.status_code, resp_update.text)
 
-    for file in resp_update.json():
+    for file in resp_update.json()['files']:
         self_file = file["links"]["self"]
         r = requests.delete(self_file, params={"access_token": token})
         print_now(r.status_code, r.text)
