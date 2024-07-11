@@ -1,7 +1,7 @@
 import argparse
 import os
 import json
-
+from tabulate import tabulate
 
 def main():
     parser = argparse.ArgumentParser(description='Generate a report of status of each beamline for a python version')
@@ -106,13 +106,15 @@ def main():
     success_percentage = int(float(num_success_jobs / num_total_tests) * 100)
 
     md_str = ""
+    headers = ["Beamline", "Conclusion", "Message", "URL"]
+    table = []
     with open(f"{args.markdown_name}.md", "w") as md:
         # md.write("### Success Rate: " + str(success_percentage) + "%\n")
         # md.write("|Beamline|Conclusion|Message|URL|\n")
         # md.write("|:---:|:---:|:---:|:---:|\n")
         md_str += "### Success Rate: " + str(success_percentage) + "%\n"
-        md_str += "|Beamline|Conclusion|Message|URL|\n"
-        md_str += "|:---:|:---:|:---:|:---:|\n"
+        # md_str += "|Beamline|Conclusion|Message|URL|\n"
+        # md_str += "|:---:|:---:|:---:|:---:|\n"
 
         # looping like this to give more control over sorting
         for element in relevant_jobs:
@@ -124,21 +126,25 @@ def main():
                     case "failure":
                         failure_msg = "failure"
                         message = results['message'].replace("\n", " ")
-                        md_str += f"|{element_name}|{failure_msg}|{message}|{results['url']}|\n"
+                        table.append([element_name, failure_msg, message, results['url']])
+                        # md_str += f"|{element_name}|{failure_msg}|{message}|{results['url']}|\n"
                         # md.write(f"|{element_name}|{failure_msg}|{message}|{results['url']}|\n")
                         print("failure")
                     case "success":
                         success_msg = "success"
                         message = results['message'].replace("\n", " ")
-                        md_str += f"|{element_name}|{success_msg}|{message}|{results['url']}|\n"
+                        table.append([element_name, success_msg, message, results['url']])
+                        # md_str += f"|{element_name}|{success_msg}|{message}|{results['url']}|\n"
                         # md.write(f"|{element_name}|{success_msg}|{message}|{results['url']}|\n")
                         print("success")
                     case "cancelled":
                         cancelled_msg = "cancelled"
                         message = results['message'].replace("\n", " ")
-                        md_str += f"|{element_name}|{cancelled_msg}|{message}|{results['url']}|\n"
+                        table.append([element_name, cancelled_msg, message, results['url']])
+                        # md_str += f"|{element_name}|{cancelled_msg}|{message}|{results['url']}|\n"
                         # md.write(f"|{element_name}|{success_msg}|{message}|{results['url']}|\n")
                         print("cancelled")
+        md_str += tabulate(table, headers, tablefmt="github")
         md.write(md_str)
         md.close()
 
