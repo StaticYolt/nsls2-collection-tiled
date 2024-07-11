@@ -26,7 +26,7 @@ def main():
         job_name = "3."
         for element in data['jobs']:
             if element['name'][-4:-2] == job_name:
-                print(element)
+                # print(element)
                 relevant_jobs.append(element)
 
     with open(f'{args.json_name}.json') as f:
@@ -39,7 +39,7 @@ def main():
                     success_jobs.append(element)
                 case _:
                     # This should never happen
-                    print("ERROR")
+                    print("OTHER")
 
     num_total_tests = len(relevant_jobs)
     num_success_jobs = len(success_jobs)
