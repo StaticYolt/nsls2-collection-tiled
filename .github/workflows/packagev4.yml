@@ -177,6 +177,12 @@ jobs:
         run: |
           mkdir "${{matrix.repos.repo}}"
           git clone -b ${{matrix.repos.branch}} "${{ env.REPO_URL }}" "${{matrix.repos.repo}}"
+      - name: Set Up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+      - name: Beamline Specific Configurations
+        run: python3 special_config -b "${{ matrix.repo.beamline_acronym }}"
       - name: Configuring defaults (pyOlog, databroker, and kafka)
         run: |
           echo "pyOlog config:"
@@ -250,10 +256,6 @@ jobs:
         uses: supercharge/mongodb-github-action@1.11.0
         with:
           mongodb-version: '4.4'
-      - name: Set Up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.11
       - name: Performing Beamline Actions
         env:
           BEAMLINE_ACRONYM: ${{matrix.repos.beamline_acronym}}
@@ -291,6 +293,7 @@ jobs:
           nohup tiled serve catalog --temp --api-key=$TILED_API_KEY &
           sleep 10
           ipython --profile-dir "${{ matrix.repos.repo }}"
+      #1> output.log 2> error.log
   report_generation:
     needs: testing_conda_artifact
     if: |

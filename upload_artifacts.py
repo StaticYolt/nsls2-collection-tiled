@@ -193,9 +193,11 @@ conda-unpack
         headers={"Content-Type": "application/json"},
         data=json.dumps(data),
     )
+    print(resp_update.json())
+    print(newver_draft)
     print_now(newver_draft, resp_update.status_code, resp_update.text)
 
-    for file in resp_update.json()["files"]:
+    for file in resp_update.json():
         self_file = file["links"]["self"]
         r = requests.delete(self_file, params={"access_token": token})
         print_now(r.status_code, r.text)
