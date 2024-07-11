@@ -120,7 +120,7 @@ def main():
         for element in relevant_jobs:
             if element:
                 # gets "csx" from "version-matrix (3.10) / csx-3.10"
-                element_name = element['name'].split(" ")[-1].split("-")[0]
+                element_name = element['name'].split(" ")[-1].split("-")[0].upper()
                 results = get_check_run_url(element)
                 match element['conclusion']:
                     case "failure":
