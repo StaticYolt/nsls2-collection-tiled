@@ -68,11 +68,16 @@ def create_new_version(
         headers={"Authorization": f"Bearer {token}"},
     )
 
-    ret_newver = requests.post(
+    # print(rec.json())
+    ret_newver = requests.get(
         f"{BASE_URL}/records/{rec.json()['id']}/versions",
-        params={"access_token": token},
+        # params={"access_token": token},
     )
+    # print(f"{BASE_URL}/records/{rec.json()['id']}/versions",)
     print_now(ret_newver.url, ret_newver.status_code, ret_newver.json())
+
+    # print(ret_newver.json())
+    # print(ret_newver.json()["links"])
     newver_draft = ret_newver.json()["links"]["self"]
 
     notes_urls = [
