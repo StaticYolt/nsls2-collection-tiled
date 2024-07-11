@@ -9,8 +9,8 @@ from itertools import count
 
 import requests
 
-# BASE_URL = "https://sandbox.zenodo.org/api"
-BASE_URL = "https://zenodo.org/api"
+BASE_URL = "https://sandbox.zenodo.org/api"
+# BASE_URL = "https://zenodo.org/api"
 
 
 def print_now(*args):
