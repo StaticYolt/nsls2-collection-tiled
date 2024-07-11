@@ -187,7 +187,7 @@ conda-unpack
         }
     }
 
-    resp_update = requests.put(
+    resp_update = requests.get(
         newver_draft,
         params={"access_token": token},
         headers={"Content-Type": "application/json"},
@@ -201,6 +201,7 @@ conda-unpack
         print_now(r.status_code, r.text)
 
     bucket_url = resp_update.json()["links"]["files"]
+    print(bucket_url)
 
     all_files = {}
     if extra_files is not None:
