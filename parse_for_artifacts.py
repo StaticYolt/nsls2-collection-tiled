@@ -31,6 +31,10 @@ def main():
                           f"{args.organization}"
                           f"{str(element['id'])}"
                           f"{str(element['name'])}")
+                print(args.repository)
+                print(args.organization)
+                print(str(element['id']))
+                print(str(element['name']))
 
 if __name__ == "__main__":
     main()
