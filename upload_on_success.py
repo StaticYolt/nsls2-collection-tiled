@@ -47,7 +47,7 @@ def main():
 
     if success_percentage > 50:
         conceptrecid = "84205" # never changes, it's for the initial version.
-        version = "2024-2.2"
+        version = "2024-2.1"
         token = os.environ["ZENODO_TOKEN"]
         resp = upload_artifacts.create_new_version(
             conceptrecid=conceptrecid,
