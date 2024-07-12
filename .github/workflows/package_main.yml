@@ -18,6 +18,7 @@ jobs:
     if: always()
     env:
       WORKFLOW_ID: ${{ github.run_id }}
+      TZ: America/New_York
     steps:
       - name: Set env vars
         run: |
@@ -35,13 +36,46 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
-#      - name: download artifacts v2
-#        run: |
-#          set -vxeuo pipefail
-#
+      - name: Install YAML CLI tools
+        run: |
+          python3 -m pip install shyaml
+      - name: download artifacts v2
+        run: |
+          set -vxeuo pipefail
+          python3 parse_for_artifacts.py -a "${{ env.WORKFLOW_ID }}"
+      - name: Export files
+        run: |
+          export ARTIFACTS_DIR="$HOME/artifacts"
+          echo "ARTIFACTS_DIR=${ARTIFACTS_DIR}" >> $GITHUB_ENV
+          if [ ! -d "${ARTIFACTS_DIR}" ]; then
+              mkdir -v -p "${ARTIFACTS_DIR}"
+          fi
+          CONDA_PACK_ENV_NAME='2024-2.1-py310-tiled'
+          # conda env export -n ${CONDA_PACK_ENV_NAME} -f ${ARTIFACTS_DIR}/${CONDA_PACK_ENV_NAME}.yml -c conda-forge --override-channels
+          conda env export -f ${ARTIFACTS_DIR}/${CONDA_PACK_ENV_NAME}.yml
+          # Per https://conda.github.io/conda-pack/cli.html:
+          conda-pack -o ${ARTIFACTS_DIR}/${CONDA_PACK_ENV_NAME}.tar.gz --ignore-missing-files --ignore-editable-packages
+          openssl sha256 ${ARTIFACTS_DIR}/${CONDA_PACK_ENV_NAME}.tar.gz > ${ARTIFACTS_DIR}/${CONDA_PACK_ENV_NAME}-sha256sum.txt
+          openssl md5 ${ARTIFACTS_DIR}/${CONDA_PACK_ENV_NAME}.tar.gz > ${ARTIFACTS_DIR}/${CONDA_PACK_ENV_NAME}-md5sum.txt
+          chmod -v 664 ${ARTIFACTS_DIR}/${CONDA_PACK_ENV_NAME}[.-]*
+          CONDA_PACK_ENV_NAME='2024-2.1-py312-tiled'
+          # conda env export -n ${CONDA_PACK_ENV_NAME} -f ${ARTIFACTS_DIR}/${CONDA_PACK_ENV_NAME}.yml -c conda-forge --override-channels
+          conda env export -f ${ARTIFACTS_DIR}/${CONDA_PACK_ENV_NAME}.yml
+          # Per https://conda.github.io/conda-pack/cli.html:
+          conda-pack -o ${ARTIFACTS_DIR}/${CONDA_PACK_ENV_NAME}.tar.gz --ignore-missing-files --ignore-editable-packages
+          openssl sha256 ${ARTIFACTS_DIR}/${CONDA_PACK_ENV_NAME}.tar.gz > ${ARTIFACTS_DIR}/${CONDA_PACK_ENV_NAME}-sha256sum.txt
+          openssl md5 ${ARTIFACTS_DIR}/${CONDA_PACK_ENV_NAME}.tar.gz > ${ARTIFACTS_DIR}/${CONDA_PACK_ENV_NAME}-md5sum.txt
+          chmod -v 664 ${ARTIFACTS_DIR}/${CONDA_PACK_ENV_NAME}[.-]*
+          CONDA_PACK_ENV_NAME='2024-2.1-py311-tiled'
+          # conda env export -n ${CONDA_PACK_ENV_NAME} -f ${ARTIFACTS_DIR}/${CONDA_PACK_ENV_NAME}.yml -c conda-forge --override-channels
+          conda env export -f ${ARTIFACTS_DIR}/${CONDA_PACK_ENV_NAME}.yml
+          # Per https://conda.github.io/conda-pack/cli.html:
+          conda-pack -o ${ARTIFACTS_DIR}/${CONDA_PACK_ENV_NAME}.tar.gz --ignore-missing-files --ignore-editable-packages
+          openssl sha256 ${ARTIFACTS_DIR}/${CONDA_PACK_ENV_NAME}.tar.gz > ${ARTIFACTS_DIR}/${CONDA_PACK_ENV_NAME}-sha256sum.txt
+          openssl md5 ${ARTIFACTS_DIR}/${CONDA_PACK_ENV_NAME}.tar.gz > ${ARTIFACTS_DIR}/${CONDA_PACK_ENV_NAME}-md5sum.txt
+          chmod -v 664 ${ARTIFACTS_DIR}/${CONDA_PACK_ENV_NAME}[.-]*
       - name: Upload artifacts to Zenodo
         run: |
-          python3 parse_for_artifacts.py -a "${{ env.WORKFLOW_ID }}"
           ls
           pwd
           python3 -m pip install requests

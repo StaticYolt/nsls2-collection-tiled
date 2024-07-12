@@ -28,7 +28,7 @@ def main():
             if element['name'][-4:-2] == job_name:
                 # print(element)
                 relevant_jobs.append(element)
-
+            #and os.path.splitext(element['name'])[1] != '.yml'
     with open(f'{args.json_name}.json') as f:
         data = json.load(f)
         sort_by_py_version(data)
@@ -105,21 +105,21 @@ def main():
                 # f"{version}-py39-tiled.tar.gz": "rb",
 
                 # Python 3.10 (tiled)
-                # f"{version}-py310-tiled-md5sum.txt": "r",
-                # f"{version}-py310-tiled-sha256sum.txt": "r",
-                # f"{version}-py310-tiled.yml.txt": "r",
+                f"{version}-py310-tiled-md5sum.txt": "r",
+                f"{version}-py310-tiled-sha256sum.txt": "r",
+                f"{version}-py310-tiled.yml.txt": "r",
                 f"{version}-py310-tiled.tar.gz": "rb",
 
                 # Python 3.11 (tiled)
-                # f"{version}-py311-tiled-md5sum.txt": "r",
-                # f"{version}-py311-tiled-sha256sum.txt": "r",
-                # f"{version}-py311-tiled.yml.txt": "r",
+                f"{version}-py311-tiled-md5sum.txt": "r",
+                f"{version}-py311-tiled-sha256sum.txt": "r",
+                f"{version}-py311-tiled.yml.txt": "r",
                 f"{version}-py311-tiled.tar.gz": "rb",
 
                 # Python 3.12 (tiled)
-                # f"{version}-py312-tiled-md5sum.txt": "r",
-                # f"{version}-py312-tiled-sha256sum.txt": "r",
-                # f"{version}-py312-tiled.yml.txt": "r",
+                f"{version}-py312-tiled-md5sum.txt": "r",
+                f"{version}-py312-tiled-sha256sum.txt": "r",
+                f"{version}-py312-tiled.yml.txt": "r",
                 f"{version}-py312-tiled.tar.gz": "rb",
             },
         )
