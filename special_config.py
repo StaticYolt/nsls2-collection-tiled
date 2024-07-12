@@ -12,14 +12,17 @@ def main():
     parser.add_argument("-b", "--beamline_acronym", help="Example csx")
     args = parser.parse_args()
 
-    match args.beamline_acronym:
-        case "csx":
-            curr_bdict = bdict.get("csx")
-        case "srx":
-            pass
-            curr_bdict = bdict.get("srx")
-        case _:
-            pass
+
+    curr_bdict = bdict.get(args.beamline_acronym, {})
+
+    # match args.beamline_acronym:
+    #     case "csx":
+    #         curr_bdict = bdict.get("csx")
+    #     case "srx":
+    #         pass
+    #         curr_bdict = bdict.get("srx")
+    #     case _:
+    #         pass
 
     if curr_bdict:
         print(curr_bdict)

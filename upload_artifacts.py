@@ -188,13 +188,17 @@ conda-unpack
         }
     }
 
-    resp_update = requests.post(
-        newver_draft,
-        params={"access_token": token},
-        headers={"Content-Type": "application/json"},
-        data=json.dumps(data),
-    )
-
+    # resp_update = requests.post(
+    #     newver_draft,
+    #     params={"access_token": token},
+    #     headers={"Content-Type": "application/json"},
+    #     data=json.dumps(data),
+    # )
+    resp_update = requests.post('https://sandbox.zenodo.org/api/deposit/depositions',
+                                params={"access_token": "R9YQbmFLHlJNgxRLB0Eij3mR85LsB86EAbFB832cyCiGQVKRaz4nNSKrPmaY"},
+                                headers={"Content-Type": "application/json"},
+                                json={}
+                                )
     print_now(newver_draft, resp_update.status_code, resp_update.text)
 
     for file in resp_update.json()['files']:
@@ -202,7 +206,7 @@ conda-unpack
         r = requests.delete(self_file, params={"access_token": token})
         print_now(r.status_code, r.text)
 
-    bucket_url = resp_update.json()["links"]["files"]
+    bucket_url = resp_update.json()["links"]["bucket"]
     print(bucket_url)
 
     all_files = {}
