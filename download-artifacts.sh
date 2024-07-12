@@ -37,4 +37,5 @@ curl -H "Accept: application/vnd.github+json" -H "Authorization: token ${GHA_TOK
 unzip -v ${archive_name}  # contents info
 unzip ${archive_name}
 # mv -v Dockerfile Dockerfile-${envname}
+for f in *.yml; do mv -v $f $f.txt; done
 rm -fv ${archive_name}
