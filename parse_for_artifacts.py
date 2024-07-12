@@ -7,7 +7,7 @@ def main():
     parser = argparse.ArgumentParser(description='Parses Json and passes arguments to download-artifacts-sh')
     parser.add_argument("-o", "--organization", default="StaticYolt",
                         help="The organization the repository is under")
-    parser.add_argument("-a", "--action_run", help="The ID of the workflow that was run")
+    parser.add_argument("-a", "--action_run", help="The ID of the workflow that was run", default="9908277360")
     parser.add_argument("-f", "--file_name", default="artifact_info",
                         help="jsonfile containg info about all artifacts created from some repository")
     parser.add_argument("-r", "--repository", default="nsls2-collection-tiled")

@@ -39,9 +39,12 @@ jobs:
         run: |
           set -vxeuo pipefail
           python3 parse_for_artifacts.py -a "${{ env.WORKFLOW_ID }}"
+          pwd
           ls
       - name: Upload artifacts to Zenodo
         run: |
+          ls
+          pwd
           python3 -m pip install requests
           python3 upload_on_success.py -a "${{ env.WORKFLOW_ID }}"
 
