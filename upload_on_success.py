@@ -1,7 +1,10 @@
 import argparse
+import datetime
 import os
 import json
 import subprocess
+from pprint import pprint
+
 import upload_artifacts
 import requests
 def main():
@@ -45,84 +48,137 @@ def main():
     num_success_jobs = len(success_jobs)
     success_percentage = int(float(num_success_jobs / num_total_tests) * 100)
 
+    def upload_to_zenodo(conceptrecid=None, version=None, extra_files=None, token=None):
+        notes_urls = [
+            # # non-tiled
+            # "https://github.com/nsls2-conda-envs/nsls2-collection/pull/28",
+            # "https://github.com/nsls2-conda-envs/nsls2-collection/actions/runs/7603753363",
+            # # need this empty line to enforce line break on Zenodo:
+            # "",
+            # tiled
+            "https://github.com/nsls2-conda-envs/nsls2-collection-tiled/pull/39",
+            "https://github.com/nsls2-conda-envs/nsls2-collection-tiled/actions/runs/9762354757",
+        ]
+        notes_urls_strs = "<br>\n".join([f'<a href="{url}">{url}</a>'
+                                         if url else ""
+                                         for url in notes_urls])
+
+        unpack_instructions = """
+        Unpacking instructions:
+        <br>
+        <pre>
+        mkdir -p ~/conda_envs/&lt;env-name&gt;
+        cd ~/conda_envs/&lt;env-name&gt;
+        wget &lt;url-to&gt;/&lt;env-name&gt;.tar.gz
+        tar -xvf &lt;env-name&gt;.tar.gz
+        conda activate $PWD
+        conda-unpack
+        </pre>
+        """
+        data = {
+            "metadata": {
+                "version": version,
+                "title": f"NSLS-II collection conda environment version with Python 3.10, 3.11, and 3.12",
+                "description": f"NSLS-II collection environment deployed to the experimental floor.<br><br>{notes_urls_strs}",
+                "upload_type": "software",
+                "publication_date": datetime.datetime.now().strftime("%Y-%m-%d"),
+                "publisher": "NSLS-II, Brookhaven National Laboratory",
+                "prereserve_doi": True,
+                "keywords": [
+                    "conda",
+                    "NSLS-II",
+                    "bluesky",
+                    "data acquisition",
+                    "conda-forge",
+                    "conda-pack",
+                ],
+                "additional_descriptions": [
+                    {
+                        "description": unpack_instructions,
+                        "type": {
+                            "id": "notes",
+                            "title": {
+                                "en": "Unpacking instructions"
+                            }
+                        },
+                    },
+                ],
+                "creators": [
+                    {
+                        'name': 'Rakitin, Max',
+                        'affiliation': 'NSLS-II, Brookhaven National Labratory',
+                        'orcid': '0000-0003-3685-852X',
+                    },
+                    {
+                        'name': 'Bischof, Garrett',
+                        'affiliation': 'NSLS-II, Brookhaven National Labratory',
+                        'orcid': '0000-0001-9351-274X',
+                    },
+                    {
+                        'name': 'Aishima, Jun',
+                        'affiliation': 'NSLS-II, Brookhaven National Labratory',
+                        'orcid': '0000-0003-4710-2461',
+                    },
+                ],
+            }
+        }
+        ret_ver = requests.get(
+            url=f"https://sandbox.zenodo.org/api/deposit/depositions/{conceptrecid}?access_token={token}",
+            headers={"Content-Type": "application/json"})
+        pprint(ret_ver.json())
+
+        new_ver_link = ret_ver.json()['links']['newversion']
+
+        new_ver = requests.post(url=new_ver_link,
+                                headers={"Content-Type": "application/json"},
+                                data=json.dumps(data),
+                                params={"access_token": token})
+        pprint(new_ver.json())
+
+        for depot_file in new_ver.json()['files']:
+            requests.delete(url=depot_file['links']['self'],
+                            params={"access_token": token})
+
+        r = requests.post(url=new_ver.json()['links']['files'],
+                          data={'name': 'file3'},
+                          files={'file': open(
+                              '/Users/leocheng/PycharmProjects/nsls2-collection-tiled/particle_accelrator.gif.zip',
+                              'rb')},
+                          params={'access_token': token})
+        pprint(r.json())
     if success_percentage > 50:
         conceptrecid = "84205" # never changes, it's for the initial version.
         version = "2024-2.1"
         token = os.environ["ZENODO_TOKEN"]
-        resp = upload_artifacts.create_new_version(
-            conceptrecid=conceptrecid,
-            # version=f"{version}-tiled",
-            version=f"{version}",
-            token=f"{token}",
-            # extra_files={"README.md": "r", "LICENSE": "r"}  # used for testing purposes
-            extra_files={
-                # # Python 3.8 (non-tiled)
-                # f"{version}-py38-md5sum.txt": "r",
-                # f"{version}-py38-sha256sum.txt": "r",
-                # f"{version}-py38.yml": "r",
-                # f"Dockerfile-{version}-py38": "r",
-                # f"runner-{version}-py38.sh": "r",
-                # f"{version}-py38.tar.gz": "rb",
-
-                # # Python 3.9 (non-tiled)
-                # f"{version}-py39-md5sum.txt": "r",
-                # f"{version}-py39-sha256sum.txt": "r",
-                # f"{version}-py39.yml": "r",
-                # f"Dockerfile-{version}-py39": "r",
-                # f"runner-{version}-py39.sh": "r",
-                # f"{version}-py39.tar.gz": "rb",
-
-                # # Python 3.10 (non-tiled)
-                # f"{version}-py310-md5sum.txt": "r",
-                # f"{version}-py310-sha256sum.txt": "r",
-                # f"{version}-py310.yml": "r",
-                # f"Dockerfile-{version}-py310": "r",
-                # f"runner-{version}-py310.sh": "r",
-                # f"{version}-py310.tar.gz": "rb",
-
-                # # Python 3.11 (non-tiled)
-                # f"{version}-py311-md5sum.txt": "r",
-                # f"{version}-py311-sha256sum.txt": "r",
-                # f"{version}-py311.yml": "r",
-                # f"Dockerfile-{version}-py311": "r",
-                # f"runner-{version}-py311.sh": "r",
-                # f"{version}-py311.tar.gz": "rb",
-
-                # # Python 3.8 (tiled)
-                # f"{version}-py38-tiled-md5sum.txt": "r",
-                # f"{version}-py38-tiled-sha256sum.txt": "r",
-                # f"{version}-py38-tiled.yml": "r",
-                # f"Dockerfile-{version}-py38-tiled": "r",
-                # f"runner-{version}-py38-tiled.sh": "r",
-                # f"{version}-py38-tiled.tar.gz": "rb",
-
-                # # Python 3.9 (tiled)
-                # f"{version}-py39-tiled-md5sum.txt": "r",
-                # f"{version}-py39-tiled-sha256sum.txt": "r",
-                # f"{version}-py39-tiled.yml": "r",
-                # f"Dockerfile-{version}-py39-tiled": "r",
-                # f"runner-{version}-py39-tiled.sh": "r",
-                # f"{version}-py39-tiled.tar.gz": "rb",
-
-                # Python 3.10 (tiled)
-                f"{version}-py310-tiled-md5sum.txt": "r",
-                f"{version}-py310-tiled-sha256sum.txt": "r",
-                f"{version}-py310-tiled.yml.txt": "r",
-                f"{version}-py310-tiled.tar.gz": "rb",
-
-                # Python 3.11 (tiled)
-                f"{version}-py311-tiled-md5sum.txt": "r",
-                f"{version}-py311-tiled-sha256sum.txt": "r",
-                f"{version}-py311-tiled.yml.txt": "r",
-                f"{version}-py311-tiled.tar.gz": "rb",
-
-                # Python 3.12 (tiled)
-                f"{version}-py312-tiled-md5sum.txt": "r",
-                f"{version}-py312-tiled-sha256sum.txt": "r",
-                f"{version}-py312-tiled.yml.txt": "r",
-                f"{version}-py312-tiled.tar.gz": "rb",
-            },
-        )
+        upload_to_zenodo(conceptrecid=conceptrecid,
+                         version=version,
+                         token=token)
+        # resp = upload_artifacts.create_new_version(
+        #     conceptrecid=conceptrecid,
+        #     # version=f"{version}-tiled",
+        #     version=f"{version}",
+        #     token=f"{token}",
+        #     # extra_files={"README.md": "r", "LICENSE": "r"}  # used for testing purposes
+        #     extra_files={
+        #         # Python 3.10 (tiled)
+        #         f"{version}-py310-tiled-md5sum.txt": "r",
+        #         f"{version}-py310-tiled-sha256sum.txt": "r",
+        #         f"{version}-py310-tiled.yml.txt": "r",
+        #         f"{version}-py310-tiled.tar.gz": "rb",
+        #
+        #         # Python 3.11 (tiled)
+        #         f"{version}-py311-tiled-md5sum.txt": "r",
+        #         f"{version}-py311-tiled-sha256sum.txt": "r",
+        #         f"{version}-py311-tiled.yml.txt": "r",
+        #         f"{version}-py311-tiled.tar.gz": "rb",
+        #
+        #         # Python 3.12 (tiled)
+        #         f"{version}-py312-tiled-md5sum.txt": "r",
+        #         f"{version}-py312-tiled-sha256sum.txt": "r",
+        #         f"{version}-py312-tiled.yml.txt": "r",
+        #         f"{version}-py312-tiled.tar.gz": "rb",
+        #     },
+        # )
         # with open('upload_artifacts.py') as file:
         #     exec(file.read())
         # print("RUNNING UPLOAD ARTIFACTS")

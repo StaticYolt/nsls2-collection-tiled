@@ -31,6 +31,7 @@ fi
 echo -e "\nDownloading the artifact_id=${artifact_id} for the '${repo_name}' repo: envname=${envname}\n"
 
 archive_name="${envname}.zip"
+
 curl -H "Accept: application/vnd.github+json" -H "Authorization: token ${GHA_TOKEN}" -L -o ${archive_name} "https://api.github.com/repos/${org_name}/${repo_name}/actions/artifacts/${artifact_id}/zip"
 #curl -L "https://api.github.com/repos/${org_name}/${repo_name}/actions/artifacts/${artifact_id}/zip" > ${archive_name}
 #curl -H "Accept: application/vnd.github+json" -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -L -o firmware.zip "https://api.github.com/repos/ExpressLRS/ExpressLRS/actions/artifacts/308108746/zip"
