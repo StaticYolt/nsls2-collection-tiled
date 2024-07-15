@@ -138,11 +138,11 @@ def main():
         for depot_file in new_ver.json()['files']:
             requests.delete(url=depot_file['links']['self'],
                             params={"access_token": token})
-
+        basename = os.path.basename("particle_accelrator.gif.zip")
         r = requests.post(url=new_ver.json()['links']['files'],
                           data={'name': 'file3'},
                           files={'file': open(
-                              '/Users/leocheng/PycharmProjects/nsls2-collection-tiled/particle_accelrator.gif.zip',
+                              basename,
                               'rb')},
                           params={'access_token': token})
         pprint(r.json())
