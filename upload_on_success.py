@@ -139,11 +139,10 @@ def main():
             requests.delete(url=depot_file['links']['self'],
                             params={"access_token": token})
         basename = os.path.basename("particle_accelrator.gif.zip")
+        print(basename)
         r = requests.post(url=new_ver.json()['links']['files'],
                           data={'name': 'file3'},
-                          files={'file': open(
-                              basename,
-                              'rb')},
+                          files={'file': open(basename,'rb')},
                           params={'access_token': token})
         pprint(r.json())
     if success_percentage > 50:
