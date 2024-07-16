@@ -165,8 +165,8 @@ def main():
                             # Python 3.10 (tiled)
                             f"{version}-py310-tiled-md5sum.txt": "r",
                             f"{version}-py310-tiled-sha256sum.txt": "r",
-                            f"{version}-py310-tiled.yml.txt": "r",
                             f"{version}-py310-tiled.tar.gz": "rb",
+                            f"{version}-py310-tiled.yml.txt": "r",
 
                             # Python 3.11 (tiled)
                             f"{version}-py311-tiled-md5sum.txt": "r",
