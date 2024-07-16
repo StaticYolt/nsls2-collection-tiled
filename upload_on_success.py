@@ -151,6 +151,7 @@ def main():
                               data={'name': upload_file},
                               files={'file': open(basename, mode)},
                               params={'access_token': token})
+            # Avoid error trace is misleading it should be something like "No connection could be made because the target machine actively refused it".
             time.sleep(.1)
             pprint(r.json())
     if success_percentage > 50:
