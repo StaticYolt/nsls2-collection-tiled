@@ -2,6 +2,8 @@ name: Main Workflow
 
 on:
   push:
+  workflow_dispatch:
+
 
 jobs:
   version-matrix:
