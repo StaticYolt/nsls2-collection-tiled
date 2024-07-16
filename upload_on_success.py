@@ -49,6 +49,11 @@ def main():
     success_percentage = int(float(num_success_jobs / num_total_tests) * 100)
 
     def upload_to_zenodo(conceptrecid=None, version=None, extra_files=None, token=None):
+        if extra_files is None:
+            raise ValueError(
+                "Files cannot be None, specify a dict with file names "
+                "as keys and access mode as values"
+            )
         notes_urls = [
             # # non-tiled
             # "https://github.com/nsls2-conda-envs/nsls2-collection/pull/28",
@@ -138,20 +143,40 @@ def main():
         for depot_file in new_ver.json()['files']:
             requests.delete(url=depot_file['links']['self'],
                             params={"access_token": token})
-        basename = os.path.basename("particle_accelrator.gif.zip")
-        print(basename)
-        r = requests.post(url=new_ver.json()['links']['files'],
-                          data={'name': 'file3'},
-                          files={'file': open(basename,'rb')},
-                          params={'access_token': token})
-        pprint(r.json())
+
+        for upload_file, mode in extra_files.items():
+            basename = os.path.basename(upload_file)
+            r = requests.post(url=new_ver.json()['links']['files'],
+                              data={'name': upload_file},
+                              files={'file': open(basename, mode)},
+                              params={'access_token': token})
+            pprint(r.json())
     if success_percentage > 50:
         conceptrecid = "84205" # never changes, it's for the initial version.
         version = "2024-2.1"
         token = os.environ["ZENODO_TOKEN"]
         upload_to_zenodo(conceptrecid=conceptrecid,
                          version=version,
-                         token=token)
+                         token=token,
+                         extra_files={
+                            # Python 3.10 (tiled)
+                            f"{version}-py310-tiled-md5sum.txt": "r",
+                            f"{version}-py310-tiled-sha256sum.txt": "r",
+                            f"{version}-py310-tiled.yml.txt": "r",
+                            f"{version}-py310-tiled.tar.gz": "rb",
+
+                            # Python 3.11 (tiled)
+                            f"{version}-py311-tiled-md5sum.txt": "r",
+                            f"{version}-py311-tiled-sha256sum.txt": "r",
+                            f"{version}-py311-tiled.yml.txt": "r",
+                            f"{version}-py311-tiled.tar.gz": "rb",
+
+                            # Python 3.12 (tiled)
+                            f"{version}-py312-tiled-md5sum.txt": "r",
+                            f"{version}-py312-tiled-sha256sum.txt": "r",
+                            f"{version}-py312-tiled.yml.txt": "r",
+                            f"{version}-py312-tiled.tar.gz": "rb",
+                         })
         # resp = upload_artifacts.create_new_version(
         #     conceptrecid=conceptrecid,
         #     # version=f"{version}-tiled",
