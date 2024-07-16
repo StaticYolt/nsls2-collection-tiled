@@ -3,6 +3,7 @@ import datetime
 import os
 import json
 import subprocess
+import time
 from pprint import pprint
 
 import upload_artifacts
@@ -150,6 +151,7 @@ def main():
                               data={'name': upload_file},
                               files={'file': open(basename, mode)},
                               params={'access_token': token})
+            time.sleep(.1)
             pprint(r.json())
     if success_percentage > 50:
         conceptrecid = "84205" # never changes, it's for the initial version.
