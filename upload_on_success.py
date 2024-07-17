@@ -147,13 +147,17 @@ def main():
 
         for upload_file, mode in extra_files.items():
             basename = os.path.basename(upload_file)
-            r = requests.post(url=new_ver.json()['links']['files'],
-                              data={'name': upload_file},
-                              files={'file': open(basename, mode)},
-                              params={'access_token': token})
-            # Avoid error trace is misleading it should be something like "No connection could be made because the target machine actively refused it".
-            time.sleep(20)
-            pprint(r.json())
+            if mode == "rb":
+                pass
+            elif mode == "r":
+                r = requests.post(url=new_ver.json()['links']['files'],
+                                  data={'name': upload_file},
+                                  files={'file': open(basename, mode)},
+                                  params={'access_token': token})
+                pprint(r.json())
+                # Avoid error trace is misleading it should be something like "No connection could be made because the target machine actively refused it".
+            time.sleep(1)
+
     if success_percentage > 50:
         conceptrecid = "84205" # never changes, it's for the initial version.
         version = "2024-2.1"
