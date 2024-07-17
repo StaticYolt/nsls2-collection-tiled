@@ -9,8 +9,8 @@ from itertools import count
 
 import requests
 
-BASE_URL = "https://sandbox.zenodo.org/api"
-# BASE_URL = "https://zenodo.org/api"
+# BASE_URL = "https://sandbox.zenodo.org/api"
+BASE_URL = "https://zenodo.org/api"
 
 
 def print_now(*args):
@@ -33,7 +33,6 @@ def upload_files(bucket_url, files, token):
         data=json.dumps([{"key": os.path.basename(file)} for file in files]),
     )
     print_now(ret_declare.status_code, ret_declare.text)
-    print(ret_declare.json())
 
     for file, mode in files.items():
         print_now(f"Uploading {file}...")
@@ -68,17 +67,13 @@ def create_new_version(
         f"{BASE_URL}/records/{conceptrecid}/versions/latest",
         headers={"Authorization": f"Bearer {token}"},
     )
-
-    # print(rec.json())
-    ret_newver = requests.get(
+    pprint(rec.json())
+    ret_newver = requests.post(
         f"{BASE_URL}/records/{rec.json()['id']}/versions",
-        # params={"access_token": token},
+        params={"access_token": token},
     )
-    # print(f"{BASE_URL}/records/{rec.json()['id']}/versions",)
     print_now(ret_newver.url, ret_newver.status_code, ret_newver.json())
 
-    # print(ret_newver.json())
-    # print(ret_newver.json()["links"])
     newver_draft = ret_newver.json()["links"]["self"]
 
     notes_urls = [
@@ -188,26 +183,20 @@ conda-unpack
         }
     }
 
-    resp_update = requests.post(
+    resp_update = requests.put(
         newver_draft,
         params={"access_token": token},
         headers={"Content-Type": "application/json"},
         data=json.dumps(data),
     )
-    # resp_update = requests.post('https://sandbox.zenodo.org/api/deposit/depositions',
-    #                             params={"access_token": token},
-    #                             headers={"Content-Type": "application/json"},
-    #                             json={}
-    #                             )
     print_now(newver_draft, resp_update.status_code, resp_update.text)
 
-    for file in resp_update.json()['files']:
+    for file in resp_update.json()["files"]:
         self_file = file["links"]["self"]
         r = requests.delete(self_file, params={"access_token": token})
         print_now(r.status_code, r.text)
 
-    bucket_url = resp_update.json()["links"]["bucket"]
-    print(bucket_url)
+    bucket_url = resp_update.json()["links"]["files"]
 
     all_files = {}
     if extra_files is not None:
@@ -249,7 +238,7 @@ def update_deposition_with_files(conceptrecid=None, files=None, token=None):
 
 if __name__ == "__main__":
 
-    conceptrecid = "12688274"  # never changes, it's for the initial version.
+    conceptrecid = "4057062"  # never changes, it's for the initial version.
     version = "2024-2.2"
     token = os.environ["ZENODO_TOKEN"]
 
@@ -328,3 +317,24 @@ if __name__ == "__main__":
         },
     )
     pprint.pprint(resp)
+
+    # files = {
+    #     # Python 3.8
+    #     "2022-2.2-py38-md5sum.txt": "r",
+    #     "2022-2.2-py38-sha256sum.txt": "r",
+    #     "2022-2.2-py38.yml": "r",
+    #     "Dockerfile-2022-2.2-py38": "r",
+    #     "runner-2022-2.2-py38.sh": "r",
+    #     "2022-2.2-py38.tar.gz": "rb",
+    #     # Python 3.9
+    #     "2022-2.2-py39-md5sum.txt": "r",
+    #     "2022-2.2-py39-sha256sum.txt": "r",
+    #     "2022-2.2-py39.yml": "r",
+    #     "Dockerfile-2022-2.2-py39": "r",
+    #     "runner-2022-2.2-py39.sh": "r",
+    #     "2022-2.2-py39.tar.gz": "rb",
+    # }
+
+    # update_deposition_with_files(
+    #     conceptrecid=conceptrecid, files=files, token=token
+    # )
