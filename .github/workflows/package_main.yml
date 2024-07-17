@@ -46,9 +46,8 @@ jobs:
           python3 parse_for_artifacts.py -a "${{ env.WORKFLOW_ID }}"
       - name: Upload artifacts to Zenodo
         run: |
-          ls
-          pwd
           python3 -m pip install requests
+          pip install --upgrade certifi
           python3 upload_on_success.py -a "${{ env.WORKFLOW_ID }}"
 
 

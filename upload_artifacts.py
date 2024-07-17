@@ -64,6 +64,9 @@ def upload_files(bucket_url, files, token):
 def create_new_version(
     conceptrecid=None, version=None, extra_files=None, token=None
 ):
+    ret_ver = requests.get(
+        url="https://sandbox.zenodo.org/api/deposit/depositions/86441?access_token=R9YQbmFLHlJNgxRLB0Eij3mR85LsB86EAbFB832cyCiGQVKRaz4nNSKrPmaY",
+        headers={"Content-Type": "application/json"})
     rec = requests.get(
         f"{BASE_URL}/records/{conceptrecid}/versions/latest",
         headers={"Authorization": f"Bearer {token}"},
@@ -188,17 +191,17 @@ conda-unpack
         }
     }
 
-    # resp_update = requests.post(
-    #     newver_draft,
-    #     params={"access_token": token},
-    #     headers={"Content-Type": "application/json"},
-    #     data=json.dumps(data),
-    # )
-    resp_update = requests.post('https://sandbox.zenodo.org/api/deposit/depositions',
-                                params={"access_token": "R9YQbmFLHlJNgxRLB0Eij3mR85LsB86EAbFB832cyCiGQVKRaz4nNSKrPmaY"},
-                                headers={"Content-Type": "application/json"},
-                                json={}
-                                )
+    resp_update = requests.post(
+        newver_draft,
+        params={"access_token": token},
+        headers={"Content-Type": "application/json"},
+        data=json.dumps(data),
+    )
+    # resp_update = requests.post('https://sandbox.zenodo.org/api/deposit/depositions',
+    #                             params={"access_token": token},
+    #                             headers={"Content-Type": "application/json"},
+    #                             json={}
+    #                             )
     print_now(newver_draft, resp_update.status_code, resp_update.text)
 
     for file in resp_update.json()['files']:
@@ -249,7 +252,7 @@ def update_deposition_with_files(conceptrecid=None, files=None, token=None):
 
 if __name__ == "__main__":
 
-    conceptrecid = "4057062"  # never changes, it's for the initial version.
+    conceptrecid = "12688274"  # never changes, it's for the initial version.
     version = "2024-2.2"
     token = os.environ["ZENODO_TOKEN"]
 
