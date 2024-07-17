@@ -47,7 +47,6 @@ jobs:
       - name: Upload artifacts to Zenodo
         run: |
           python3 -m pip install requests
-          pip install --upgrade certifi
           python3 upload_on_success.py -a "${{ env.WORKFLOW_ID }}"
 
 
