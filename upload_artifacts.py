@@ -64,9 +64,6 @@ def upload_files(bucket_url, files, token):
 def create_new_version(
     conceptrecid=None, version=None, extra_files=None, token=None
 ):
-    ret_ver = requests.get(
-        url="https://sandbox.zenodo.org/api/deposit/depositions/86441?access_token=R9YQbmFLHlJNgxRLB0Eij3mR85LsB86EAbFB832cyCiGQVKRaz4nNSKrPmaY",
-        headers={"Content-Type": "application/json"})
     rec = requests.get(
         f"{BASE_URL}/records/{conceptrecid}/versions/latest",
         headers={"Authorization": f"Bearer {token}"},
