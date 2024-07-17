@@ -67,7 +67,6 @@ def create_new_version(
         f"{BASE_URL}/records/{conceptrecid}/versions/latest",
         headers={"Authorization": f"Bearer {token}"},
     )
-    pprint(rec.json())
     ret_newver = requests.post(
         f"{BASE_URL}/records/{rec.json()['id']}/versions",
         params={"access_token": token},
