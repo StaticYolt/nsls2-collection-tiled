@@ -1,0 +1,203 @@
+name: package_env
+
+on:
+  workflow_call:
+    inputs:
+      version: # the variable you can use in place of a matrix
+        required: true
+        type: string
+
+jobs:
+  generate_conda_packd_envs:
+    name: ${{ inputs.version }} Python for Conda packed env
+    runs-on: ubuntu-latest
+    outputs:
+      test_conda_packed_name: ${{ env.TEST_ENV_NAME }}
+    env:
+      TZ: America/New_York
+
+    defaults:
+      run:
+        shell: bash -lvxeo pipefail {0}
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+
+      - name: Install Python for YAML CLI tools
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install YAML CLI tools
+        run: |
+          python3 -m pip install shyaml
+
+      - name: Set env vars
+        run: |
+          set -vxeuo pipefail
+
+          export REPOSITORY_NAME=${GITHUB_REPOSITORY#*/}  # just the repo, as opposed to org/repo
+          echo "REPOSITORY_NAME=${REPOSITORY_NAME}" >> $GITHUB_ENV
+
+          export DATETIME_STRING=$(date +%Y%m%d%H%M%S)
+          echo "DATETIME_STRING=${DATETIME_STRING}" >> $GITHUB_ENV
+
+          export PYTHONVER=$(echo ${{ inputs.version }} | sed 's/\.//g')
+          echo "PYTHONVER=${PYTHONVER}" >> $GITHUB_ENV
+
+          export CONDA_PACK_TEMPLATE_DIR=${HOME}/conda-pack-template
+          echo "CONDA_PACK_TEMPLATE_DIR=${CONDA_PACK_TEMPLATE_DIR}" >> $GITHUB_ENV
+
+          env_name=$(cat configs/config-py${PYTHONVER}.yml | shyaml get-value env_name)
+          export CONDA_PACK_ENV_NAME=${env_name}
+          echo "CONDA_PACK_ENV_NAME=${CONDA_PACK_ENV_NAME}" >> $GITHUB_ENV
+  
+          env | sort -u
+          echo "$GITHUB_ENV"
+
+      - name: Setup umamba
+        uses: mamba-org/setup-micromamba@v1
+        with:
+          environment-file: envs/env-py${{ env.PYTHONVER }}.yml
+          log-level: info
+
+      - name: Check env
+        run: |
+          # For reference: https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html.
+          conda info
+          conda env list
+          conda list
+          pip list
+          conda config --show-sources
+          conda config --show
+          printenv | sort
+        #original line 1: set -vxeuo pipefail
+
+      - name: Export files
+        run: |
+          set -vxeo pipefail
+
+          export ARTIFACTS_DIR="$HOME/artifacts"
+          echo "ARTIFACTS_DIR=${ARTIFACTS_DIR}" >> $GITHUB_ENV
+          if [ ! -d "${ARTIFACTS_DIR}" ]; then
+              mkdir -v -p "${ARTIFACTS_DIR}"
+          fi
+
+          # conda env export -n ${CONDA_PACK_ENV_NAME} -f ${ARTIFACTS_DIR}/${CONDA_PACK_ENV_NAME}.yml -c conda-forge --override-channels
+          conda env export -f ${ARTIFACTS_DIR}/${CONDA_PACK_ENV_NAME}.yml
+          # Per https://conda.github.io/conda-pack/cli.html:
+          conda-pack -o ${ARTIFACTS_DIR}/${CONDA_PACK_ENV_NAME}.tar.gz --ignore-missing-files --ignore-editable-packages
+          openssl sha256 ${ARTIFACTS_DIR}/${CONDA_PACK_ENV_NAME}.tar.gz > ${ARTIFACTS_DIR}/${CONDA_PACK_ENV_NAME}-sha256sum.txt
+          openssl md5 ${ARTIFACTS_DIR}/${CONDA_PACK_ENV_NAME}.tar.gz > ${ARTIFACTS_DIR}/${CONDA_PACK_ENV_NAME}-md5sum.txt
+          chmod -v 664 ${ARTIFACTS_DIR}/${CONDA_PACK_ENV_NAME}[.-]*
+
+      - name: Contents of the env .yml file
+        run: |
+          cat ${ARTIFACTS_DIR}/${CONDA_PACK_ENV_NAME}.yml
+
+      - name: Checksum files
+        run: |
+          cat ${ARTIFACTS_DIR}/*sum.txt
+
+      # https://github.com/actions/upload-artifact
+      - name: Upload artifacts for the env .yml file
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.CONDA_PACK_ENV_NAME }}.yml
+          path: ${{ env.ARTIFACTS_DIR }}/${{ env.CONDA_PACK_ENV_NAME }}.yml
+          retention-days: 60
+
+      - name: Upload artifacts for branch
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.CONDA_PACK_ENV_NAME }}
+          path: ${{ env.ARTIFACTS_DIR }}
+          retention-days: 14
+
+      - name: passing output
+        run: echo "TEST_ENV_NAME=${{ env.CONDA_PACK_ENV_NAME }}" >> $GITHUB_ENV
+
+  testing_conda_artifact:
+    name: ${{ matrix.repos.beamline_acronym }}-${{ inputs.version }}
+    needs: generate_conda_packd_envs
+    env:
+      CONDA_PREFIX: home/runner/miniconda
+      PROFILE_NAME: test
+      REPO_URL: "https://github.com/${{matrix.repos.org}}/${{matrix.repos.repo}}"
+    outputs:
+      test_conda_packed_name: ${{ env.TEST_CONDA_PACKED_NAME }}
+    strategy:
+      fail-fast: false
+      # just branch is the branch of profile_collections to clone and the profile_granch is the branch of profile_collections to clone the startup directory
+      matrix:
+        os: [ ubuntu-latest ]
+        repos:
+          - org: "NSLS-II-CSX"
+            repo: "profile_collection"
+            branch: "master"
+            profile_branch: "master"
+            beamline_acronym: "csx"
+          - org: "NSLS-II-SRX"
+            repo: "profile_collection"
+            branch: "master"
+            profile_branch: "master"
+            beamline_acronym: "srx"
+          - org: "NSLS-II-SIX"
+            repo: "profile_collection"
+            branch: "master"
+            profile_branch: "master"
+            beamline_acronym: "six"
+          - org: "NSLS-II-HXN"
+            repo: "profile_collection"
+            branch: "master"
+            profile_branch: "master"
+            beamline_acronym: "hxn"
+          - org: "NSLS-II-ISR"
+            repo: "profile_analysis"
+            branch: "master"
+            profile_branch: "master"
+            beamline_acronym: "isr"
+          - org: "NSLS-II-BMD"
+            repo: "profile_collection"
+            branch: "master"
+            profile_branch: "master"
+            beamline_acronym: "bmm"
+          - org: "NSLS-II-QAS"
+            repo: "profile_collection"
+            branch: "master"
+            profile_branch: "master"
+            beamline_acronym: "qas"
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "TEST_CONDA_PACKED_NAME=${{ needs.generate_conda_packd_envs.outputs.test_conda_packed_name }}" >> $GITHUB_ENV
+      - name: using test-action
+        uses: StaticYolt/testing-conda-environment@v2
+        with:
+          run-id: "${{ github.run_id }}"
+          test-conda-packed-name: "${{ env.TEST_CONDA_PACKED_NAME }}"
+          org: "${{ matrix.repos.org }}"
+          repo: "${{ matrix.repos.repo }}"
+          branch: "${{ matrix.repos.branch }}"
+          beamline-acronym: "${{ matrix.repos.qas }}"
+  report_generation:
+    needs: testing_conda_artifact
+    if: |
+      always() &&
+      (needs.testing_conda_artifact.result == 'success' || needs.testing_conda_artifact.result == 'failure')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Set Up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+      - name: Running Script To Get Job Info To md File
+        env:
+          MD_FILE_NAME: markdown_file
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 beamline_status_to_md.py -p "${{ inputs.version }}" -a "${{ github.run_id }}" -m "$MD_FILE_NAME"
+          cat "$MD_FILE_NAME.md"
+          cp "$MD_FILE_NAME.md" $GITHUB_STEP_SUMMARY
