@@ -162,7 +162,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Using testing-conda-action
-        uses: StaticYolt/testing-conda-environment@v2.2
+        uses: StaticYolt/testing-conda-environment@v3
         with:
           run-id: "${{ github.run_id }}"
           test-conda-packed-name: "${{ env.TEST_CONDA_PACKED_NAME }}"
