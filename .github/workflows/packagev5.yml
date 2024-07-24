@@ -9,6 +9,7 @@ on:
 
 jobs:
   generate_conda_packd_envs:
+    #inputs.version is from the workflow call from the main yml file
     name: ${{ inputs.version }} Python for Conda packed env
     runs-on: ubuntu-latest
     outputs:
@@ -34,6 +35,7 @@ jobs:
           python3 -m pip install shyaml
 
       - name: Set env vars
+        # Most importantly creates the Conda Environment name whose format is year-version-pythonversion-tiled
         run: |
           set -vxeuo pipefail
 
@@ -55,8 +57,8 @@ jobs:
   
           env | sort -u
           echo "$GITHUB_ENV"
-
       - name: Setup umamba
+        # Steps that creates the Conda environment from the files in envs folder
         uses: mamba-org/setup-micromamba@v1
         with:
           environment-file: envs/env-py${{ env.PYTHONVER }}.yml
@@ -123,55 +125,43 @@ jobs:
     needs: generate_conda_packd_envs
     env:
       CONDA_PREFIX: home/runner/miniconda
-      PROFILE_NAME: test
-      REPO_URL: "https://github.com/${{matrix.repos.org}}/${{matrix.repos.repo}}"
     outputs:
       test_conda_packed_name: ${{ env.TEST_CONDA_PACKED_NAME }}
     strategy:
       fail-fast: false
-      # just branch is the branch of profile_collections to clone and the profile_granch is the branch of profile_collections to clone the startup directory
       matrix:
-        os: [ ubuntu-latest ]
         repos:
           - org: "NSLS-II-CSX"
             repo: "profile_collection"
             branch: "master"
-            profile_branch: "master"
             beamline_acronym: "csx"
           - org: "NSLS-II-SRX"
             repo: "profile_collection"
             branch: "master"
-            profile_branch: "master"
             beamline_acronym: "srx"
           - org: "NSLS-II-SIX"
             repo: "profile_collection"
             branch: "master"
-            profile_branch: "master"
             beamline_acronym: "six"
           - org: "NSLS-II-HXN"
             repo: "profile_collection"
             branch: "master"
-            profile_branch: "master"
             beamline_acronym: "hxn"
           - org: "NSLS-II-ISR"
             repo: "profile_analysis"
             branch: "master"
-            profile_branch: "master"
             beamline_acronym: "isr"
           - org: "NSLS-II-BMD"
             repo: "profile_collection"
             branch: "master"
-            profile_branch: "master"
             beamline_acronym: "bmm"
           - org: "NSLS-II-QAS"
             repo: "profile_collection"
             branch: "master"
-            profile_branch: "master"
             beamline_acronym: "qas"
     runs-on: ubuntu-latest
     steps:
-      - run: echo "TEST_CONDA_PACKED_NAME=${{ needs.generate_conda_packd_envs.outputs.test_conda_packed_name }}" >> $GITHUB_ENV
-      - name: using test-action
+      - name: Using testing-conda-action
         uses: StaticYolt/testing-conda-environment@v2
         with:
           run-id: "${{ github.run_id }}"
@@ -179,7 +169,7 @@ jobs:
           org: "${{ matrix.repos.org }}"
           repo: "${{ matrix.repos.repo }}"
           branch: "${{ matrix.repos.branch }}"
-          beamline-acronym: "${{ matrix.repos.qas }}"
+          beamline-acronym: "${{ matrix.repos.beamline-acronym }}"
   report_generation:
     needs: testing_conda_artifact
     if: |
