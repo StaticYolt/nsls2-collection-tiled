@@ -169,7 +169,7 @@ jobs:
           org: "${{ matrix.repos.org }}"
           repo: "${{ matrix.repos.repo }}"
           branch: "${{ matrix.repos.branch }}"
-          beamline-acronym: "${{ matrix.repos.beamline-acronym }}"
+          beamline-acronym: "${{ matrix.repos.qas }}"
   report_generation:
     needs: testing_conda_artifact
     if: |
