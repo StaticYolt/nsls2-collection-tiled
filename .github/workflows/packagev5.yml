@@ -124,9 +124,7 @@ jobs:
     name: ${{ matrix.repos.beamline_acronym }}-${{ inputs.version }}
     needs: generate_conda_packd_envs
     env:
-      CONDA_PREFIX: home/runner/miniconda
-    outputs:
-      test_conda_packed_name: ${{ env.TEST_CONDA_PACKED_NAME }}
+      REPO_URL: "https://github.com/${{matrix.repos.org}}/${{matrix.repos.repo}}"
     strategy:
       fail-fast: false
       matrix:
@@ -161,15 +159,16 @@ jobs:
             beamline_acronym: "qas"
     runs-on: ubuntu-latest
     steps:
-      - name: Using testing-conda-action
-        uses: StaticYolt/testing-conda-environment@v2
+      - run: echo "TEST_CONDA_PACKED_NAME=${{ needs.generate_conda_packd_envs.outputs.test_conda_packed_name }}" >> $GITHUB_ENV
+      - name: using test-action
+        uses: StaticYolt/testing-conda-environment@v3
         with:
           run-id: "${{ github.run_id }}"
           test-conda-packed-name: "${{ env.TEST_CONDA_PACKED_NAME }}"
           org: "${{ matrix.repos.org }}"
           repo: "${{ matrix.repos.repo }}"
           branch: "${{ matrix.repos.branch }}"
-          beamline-acronym: "${{ matrix.repos.qas }}"
+          beamline-acronym: "${{ matrix.repos.beamline_acronym }}"
   report_generation:
     needs: testing_conda_artifact
     if: |
